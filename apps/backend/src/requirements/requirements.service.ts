@@ -1,6 +1,6 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { LLM_PROVIDER, LLMProvider } from '../ai/llm.provider';
+import { LLM_PROVIDER, type LLMProvider } from '../ai/llm.provider';
 import { z } from 'zod';
 import { REQUIREMENT_EXTRACTION_SYSTEM_PROMPT, getRequirementExtractionUserPrompt } from '../prompts/requirement-extraction/v1';
 

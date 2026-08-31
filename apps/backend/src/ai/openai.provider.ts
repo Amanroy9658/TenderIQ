@@ -16,7 +16,7 @@ export class OpenAILLMProvider implements LLMProvider {
   }
 
   async generateStructured<T extends z.ZodType>(options: GenerateStructuredOptions<T>): Promise<z.infer<T>> {
-    const jsonSchema = zodToJsonSchema(options.schema, options.schemaName || 'StructuredOutput');
+    const jsonSchema = zodToJsonSchema(options.schema as any, options.schemaName || 'StructuredOutput');
     
     // We use the JSON schema structure OpenAI expects for structured outputs
     const response = await this.openai.chat.completions.create({
