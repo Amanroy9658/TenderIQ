@@ -73,6 +73,28 @@ export default async function TenderDetailsPage({ params }: { params: Promise<{ 
 
             <Card>
               <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Uploaded Documents
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {tender.documents?.map((doc: any) => (
+                    <li key={doc.id} className="text-sm p-2 rounded bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 flex justify-between">
+                      <span className="truncate max-w-[200px]">{doc.title}</span>
+                      <span className="text-neutral-500 text-xs">PDF</span>
+                    </li>
+                  ))}
+                  {(!tender.documents || tender.documents.length === 0) && (
+                    <p className="text-xs text-neutral-500">No documents uploaded yet.</p>
+                  )}
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
                 <CardTitle>Evaluation Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">

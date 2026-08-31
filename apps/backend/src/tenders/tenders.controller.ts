@@ -19,6 +19,7 @@ export class TendersController {
     const tender = await this.prisma.tender.findUnique({
       where: { id },
       include: {
+        documents: true,
         requirements: true,
         assessments: {
           include: {
