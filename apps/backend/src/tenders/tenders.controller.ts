@@ -34,11 +34,19 @@ export class TendersController {
 
   @Post()
   async createTender(@Body() data: { title: string; description: string; deadline?: string }) {
+    const org = await this.prisma.organization.findFirst();
+    
+    if (!org) {
+      throw new Error("No organization found to attach this tender to.");
+    }
+    
     return this.prisma.tender.create({
       data: {
         title: data.title,
         description: data.description,
         deadline: data.deadline ? new Date(data.deadline) : null,
+        status: 'OPEN',
+        organization: { connect: { id: org.id } },
       },
     });
   }
