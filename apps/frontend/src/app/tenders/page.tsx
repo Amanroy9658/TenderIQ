@@ -33,9 +33,7 @@ export default async function TendersPage() {
             <CreateTenderForm />
           </div>
           <div className="lg:col-span-2">
-            {/* We can reuse TenderList but make items clickable by wrapping in links or we modify TenderList to support links. Since TenderList doesn't have links yet, let's just use it and rely on users navigating via the UI... wait, they need to click it. I'll modify TenderList below. */}
             <TenderList tenders={tenders} />
-            <p className="text-xs text-neutral-400 mt-4">* To view details, modify TenderList to include links to /tenders/[id]</p>
           </div>
         </div>
       </main>

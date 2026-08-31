@@ -64,8 +64,24 @@ export class OpenAILLMProvider implements LLMProvider {
       case 'TenderRequirements':
         return {
           requirements: [
-            { category: 'FINANCIAL', metric: 'Minimum Turnover', condition: 'GREATER_THAN', value: { amount: 1000000 }, isMandatory: true, description: 'Must have at least 1M turnover.' },
-            { category: 'CERTIFICATION', metric: 'ISO 9001', condition: 'EQUALS', value: { required: true }, isMandatory: true, description: 'Must be ISO 9001 certified.' },
+            { 
+              title: 'Minimum Financial Turnover',
+              description: 'Must have at least 1M turnover in the last financial year.',
+              category: 'FINANCIAL', 
+              metric: 'Turnover', 
+              operator: '>=', 
+              threshold: 1000000, 
+              currency: 'USD',
+              isMandatory: true 
+            },
+            { 
+              title: 'Quality Certification',
+              description: 'Must be ISO 9001 certified and valid.',
+              category: 'CERTIFICATION', 
+              metric: 'ISO 9001', 
+              operator: '==', 
+              isMandatory: true 
+            },
           ]
         };
       case 'RequirementAssessment':
