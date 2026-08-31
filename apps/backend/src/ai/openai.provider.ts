@@ -73,13 +73,13 @@ export class OpenAILLMProvider implements LLMProvider {
           status: 'PARTIAL',
           confidence: 0.85,
           reasoning: 'The company meets the turnover requirement but ISO certification is not explicitly found in the uploaded documents.',
-          evidenceIndices: [0]
+          usedFactIds: [],
+          justification: 'Mock evaluation completed due to rate limits.'
         };
       case 'ActionableRecommendation':
         return {
-          recommendations: [
-            { action: 'Upload ISO 9001 Certification', effort: 'LOW', impact: 'HIGH', reasoning: 'This is a mandatory requirement that is currently missing.' }
-          ]
+          actionText: 'Upload ISO 9001 Certification',
+          potentialStatus: 'PASS'
         };
       default:
         return {};
