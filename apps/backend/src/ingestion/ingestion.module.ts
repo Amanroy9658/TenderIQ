@@ -15,6 +15,6 @@ import { IngestionController } from './ingestion.controller';
       useClass: PdfDocumentParser,
     },
   ],
-  exports: [IngestionService],
+  exports: [IngestionService, DOCUMENT_PARSER],
 })
 export class IngestionModule {}

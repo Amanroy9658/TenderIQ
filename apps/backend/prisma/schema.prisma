@@ -73,6 +73,7 @@ model ExtractedFact {
   snippet          String?         // Provenance text
   
   evidenceRefs     EvidenceReference[]
+  requirementEvidences RequirementEvidence[]
 
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
@@ -174,6 +175,7 @@ model RequirementEvidence {
   assessment    QualificationAssessment @relation(fields: [assessmentId], references: [id])
   
   factId        String?
+  fact          ExtractedFact? @relation(fields: [factId], references: [id])
   justification String
 }
 

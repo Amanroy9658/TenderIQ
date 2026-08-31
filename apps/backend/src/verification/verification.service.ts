@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
-export interface ResolveAssessmentDto {
+export class ResolveAssessmentDto {
   status: 'PASS' | 'FAIL' | 'PARTIAL' | 'NOT_APPLICABLE';
   reasoning: string;
 }
