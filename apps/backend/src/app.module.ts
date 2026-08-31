@@ -9,6 +9,7 @@ import { MatchingModule } from './matching/matching.module';
 import { QualificationModule } from './qualification/qualification.module';
 import { VerificationModule } from './verification/verification.module';
 import { ImpactModule } from './impact/impact.module';
+import { TendersModule } from './tenders/tenders.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ImpactModule } from './impact/impact.module';
     QualificationModule,
     VerificationModule,
     ImpactModule,
+    TendersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
