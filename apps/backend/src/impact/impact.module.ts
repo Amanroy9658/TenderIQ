@@ -1,0 +1,12 @@
+import { Module } from '@nestjs/common';
+import { ImpactService } from './impact.service';
+import { ImpactController } from './impact.controller';
+import { AiModule } from '../ai/ai.module';
+
+@Module({
+  imports: [AiModule],
+  controllers: [ImpactController],
+  providers: [ImpactService],
+  exports: [ImpactService],
+})
+export class ImpactModule {}
