@@ -10,6 +10,7 @@ import { QualificationModule } from './qualification/qualification.module';
 import { VerificationModule } from './verification/verification.module';
 import { ImpactModule } from './impact/impact.module';
 import { TendersModule } from './tenders/tenders.module';
+import { TrajectoriesModule } from './trajectories/trajectories.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TendersModule } from './tenders/tenders.module';
     VerificationModule,
     ImpactModule,
     TendersModule,
+    TrajectoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
