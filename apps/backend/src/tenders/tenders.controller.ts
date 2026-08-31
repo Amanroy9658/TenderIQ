@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Body } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, NotFoundException } from '@nestjs/common';
 import { TendersService } from './tenders.service';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -16,7 +16,7 @@ export class TendersController {
 
   @Get(':id')
   async getTender(@Param('id') id: string) {
-    return this.prisma.tender.findUnique({
+    const tender = await this.prisma.tender.findUnique({
       where: { id },
       include: {
         requirements: true,
@@ -30,6 +30,12 @@ export class TendersController {
         },
       },
     });
+    
+    if (!tender) {
+      throw new NotFoundException('Tender not found');
+    }
+    
+    return tender;
   }
 
   @Post()

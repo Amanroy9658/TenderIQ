@@ -27,8 +27,9 @@ async function getCompanyProfiles() {
   }
 }
 
-export default async function TenderDetailsPage({ params }: { params: { id: string } }) {
-  const tender = await getTender(params.id);
+export default async function TenderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const tender = await getTender(resolvedParams.id);
   const profiles = await getCompanyProfiles();
   const defaultCompanyId = profiles[0]?.id;
 
