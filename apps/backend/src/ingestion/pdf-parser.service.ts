@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DocumentParser, ParsedDocument } from './document-parser.interface';
-import * as pdfParse from 'pdf-parse';
+// Import removed to use require locally
 
 @Injectable()
 export class PdfDocumentParser implements DocumentParser {
@@ -35,7 +35,9 @@ export class PdfDocumentParser implements DocumentParser {
       pagerender: render_page,
     };
 
-    const data = await (pdfParse as any)(buffer, options);
+    const pdfParse = require('pdf-parse');
+    const parseFunc = typeof pdfParse === 'function' ? pdfParse : pdfParse.default || pdfParse.PDFParse || pdfParse;
+    const data = await parseFunc(buffer, options);
 
     return {
       text: data.text,
