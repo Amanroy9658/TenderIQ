@@ -7,41 +7,26 @@ export class PdfDocumentParser implements DocumentParser {
   private readonly logger = new Logger(PdfDocumentParser.name);
 
   async parse(buffer: Buffer): Promise<ParsedDocument> {
-    const pages: { pageNumber: number; text: string }[] = [];
-    let currentPage = 1;
+    const { PDFParse } = require('pdf-parse');
+    const parser = new PDFParse({ data: buffer });
+    
+    try {
+      const data = await parser.getText();
 
-    // Custom pagerender to capture text per page
-    const render_page = async (pageData: any) => {
-      const render_options = {
-        normalizeWhitespace: false,
-        disableCombineTextItems: false,
+      return {
+        text: data.text,
+        pages: data.pages.map((p: any) => ({
+          pageNumber: p.num,
+          text: p.text,
+        })),
       };
-      
-      try {
-        const textContent = await pageData.getTextContent(render_options);
-        const text = textContent.items.map((item: any) => item.str).join(' ');
-        pages.push({ pageNumber: currentPage, text });
-        currentPage++;
-        return text;
-      } catch (error) {
-        this.logger.error(`Error rendering page ${currentPage}`, error);
-        pages.push({ pageNumber: currentPage, text: '' });
-        currentPage++;
-        return '';
+    } catch (error) {
+      this.logger.error('Error parsing PDF', error);
+      throw error;
+    } finally {
+      if (typeof parser.destroy === 'function') {
+        await parser.destroy();
       }
-    };
-
-    const options = {
-      pagerender: render_page,
-    };
-
-    const pdfParse = require('pdf-parse');
-    const parseFunc = typeof pdfParse === 'function' ? pdfParse : pdfParse.default || pdfParse.PDFParse || pdfParse;
-    const data = await parseFunc(buffer, options);
-
-    return {
-      text: data.text,
-      pages,
-    };
+    }
   }
 }
