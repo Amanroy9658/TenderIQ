@@ -5,8 +5,10 @@ import { AiModule } from '../ai/ai.module';
 import { IngestionModule } from '../ingestion/ingestion.module';
 import { StorageModule } from '../storage/storage.module';
 
+import { PrismaModule } from '../prisma/prisma.module';
+
 @Module({
-  imports: [AiModule, IngestionModule, StorageModule],
+  imports: [AiModule, IngestionModule, StorageModule, PrismaModule],
   controllers: [EvidenceController],
   providers: [EvidenceService],
   exports: [EvidenceService],

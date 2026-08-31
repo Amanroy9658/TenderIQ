@@ -1,11 +1,25 @@
-import { Controller, Post, Param, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Param, UseInterceptors, UploadedFile, BadRequestException, Get } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { EvidenceService } from './evidence.service';
+import { PrismaService } from '../prisma/prisma.service';
 import 'multer';
 
 @Controller('company-profiles')
 export class EvidenceController {
-  constructor(private readonly evidenceService: EvidenceService) {}
+  constructor(
+    private readonly evidenceService: EvidenceService,
+    private readonly prisma: PrismaService,
+  ) {}
+
+  @Get()
+  async getCompanyProfiles() {
+    return this.prisma.companyProfile.findMany({
+      include: {
+        facts: true,
+        documents: true,
+      }
+    });
+  }
 
   @Post(':id/documents')
   @UseInterceptors(FileInterceptor('file'))

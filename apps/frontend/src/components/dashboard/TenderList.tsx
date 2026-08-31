@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
 import { Badge } from "../ui/Badge";
 import { FileText, CheckCircle, AlertTriangle, HelpCircle } from "lucide-react";
+import Link from 'next/link';
 
 export function TenderList({ tenders }: { tenders: any[] }) {
   if (!tenders || tenders.length === 0) {
@@ -35,28 +36,30 @@ export function TenderList({ tenders }: { tenders: any[] }) {
           else if (passes > 0) statusBadge = <Badge variant="success">Qualified</Badge>;
 
           return (
-            <div key={tender.id} className="flex items-center justify-between p-4 rounded-md border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors">
-              <div className="flex items-start gap-4">
-                <div className="mt-1">
-                  <FileText className="h-5 w-5 text-neutral-500" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-neutral-900 dark:text-neutral-50">{tender.title}</h4>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 max-w-md truncate">
-                    {tender.description || 'No description provided'}
-                  </p>
-                  <div className="flex gap-2 mt-2">
-                    <span className="text-xs text-neutral-500">
-                      Due: {tender.deadline ? new Date(tender.deadline).toLocaleDateString() : 'N/A'}
-                    </span>
+            <Link href={`/tenders/${tender.id}`} key={tender.id} className="block">
+              <div className="flex items-center justify-between p-4 rounded-md border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors">
+                <div className="flex items-start gap-4">
+                  <div className="mt-1">
+                    <FileText className="h-5 w-5 text-neutral-500" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-neutral-900 dark:text-neutral-50 group-hover:underline">{tender.title}</h4>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 max-w-md truncate">
+                      {tender.description || 'No description provided'}
+                    </p>
+                    <div className="flex gap-2 mt-2">
+                      <span className="text-xs text-neutral-500">
+                        Due: {tender.deadline ? new Date(tender.deadline).toLocaleDateString() : 'N/A'}
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <div className="text-right flex flex-col items-end gap-2">
+                  {statusBadge}
+                  <span className="text-xs font-mono text-neutral-400">ID: {tender.id.split('-')[0]}</span>
+                </div>
               </div>
-              <div className="text-right flex flex-col items-end gap-2">
-                {statusBadge}
-                <span className="text-xs font-mono text-neutral-400">ID: {tender.id.split('-')[0]}</span>
-              </div>
-            </div>
+            </Link>
           );
         })}
       </CardContent>
