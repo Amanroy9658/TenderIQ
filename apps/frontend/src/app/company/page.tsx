@@ -63,8 +63,8 @@ export default async function CompanyProfile() {
                   <ul className="space-y-2">
                     {profile.documents?.map((doc: any) => (
                       <li key={doc.id} className="text-sm p-2 rounded bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 flex justify-between">
-                        <span className="truncate">{doc.filename}</span>
-                        <span className="text-neutral-500 text-xs">{(doc.sizeBytes / 1024).toFixed(1)} KB</span>
+                        <span className="truncate max-w-[200px]">{doc.title}</span>
+                        <span className="text-neutral-500 text-xs">PDF</span>
                       </li>
                     ))}
                     {profile.documents?.length === 0 && <p className="text-xs text-neutral-500">No documents yet.</p>}
@@ -86,16 +86,21 @@ export default async function CompanyProfile() {
                   <div className="space-y-4">
                     {profile.facts?.map((fact: any) => (
                       <div key={fact.id} className="p-3 rounded border border-neutral-200 dark:border-neutral-800">
-                        <div className="flex justify-between items-start mb-1">
-                          <span className="text-xs font-mono bg-neutral-100 dark:bg-neutral-900 px-1.5 py-0.5 rounded text-neutral-600 dark:text-neutral-400">
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="text-xs font-mono bg-neutral-100 dark:bg-neutral-900 px-2 py-1 rounded text-neutral-600 dark:text-neutral-400">
                             {fact.category}
                           </span>
-                          <span className="text-xs text-neutral-400">conf: {fact.confidenceScore}%</span>
                         </div>
-                        <p className="font-medium text-sm text-neutral-900 dark:text-neutral-100">
-                          {typeof fact.value === 'object' ? JSON.stringify(fact.value) : fact.value}
-                        </p>
-                        <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{fact.context}</p>
+                        <div className="font-medium text-sm text-neutral-900 dark:text-neutral-100 flex flex-wrap gap-2 mt-2">
+                          {typeof fact.value === 'object' 
+                            ? Object.entries(fact.value).map(([k, v]) => (
+                                <span key={k} className="text-xs bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 px-2 py-1 rounded shadow-sm">
+                                  <span className="text-neutral-500 capitalize">{k}:</span> {typeof v === 'object' ? JSON.stringify(v) : String(v)}
+                                </span>
+                              ))
+                            : fact.value}
+                        </div>
+                        <p className="text-xs text-neutral-500 mt-3 italic line-clamp-2">"{fact.snippet}"</p>
                       </div>
                     ))}
                     {profile.facts?.length === 0 && <p className="text-xs text-neutral-500">No facts extracted yet.</p>}
