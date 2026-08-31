@@ -7,9 +7,10 @@ import { RequirementsModule } from './requirements/requirements.module';
 import { EvidenceModule } from './evidence/evidence.module';
 import { MatchingModule } from './matching/matching.module';
 import { QualificationModule } from './qualification/qualification.module';
+import { VerificationModule } from './verification/verification.module';
 
 @Module({
-  imports: [PrismaModule, IngestionModule, RequirementsModule, EvidenceModule, MatchingModule, QualificationModule],
+  imports: [PrismaModule, IngestionModule, RequirementsModule, EvidenceModule, MatchingModule, QualificationModule, VerificationModule],
   controllers: [AppController],
   providers: [AppService],
 })
