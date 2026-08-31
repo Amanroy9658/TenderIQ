@@ -92,7 +92,9 @@ export default async function CompanyProfile() {
                           </span>
                           <span className="text-xs text-neutral-400">conf: {fact.confidenceScore}%</span>
                         </div>
-                        <p className="font-medium text-sm text-neutral-900 dark:text-neutral-100">{fact.value}</p>
+                        <p className="font-medium text-sm text-neutral-900 dark:text-neutral-100">
+                          {typeof fact.value === 'object' ? JSON.stringify(fact.value) : fact.value}
+                        </p>
                         <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{fact.context}</p>
                       </div>
                     ))}

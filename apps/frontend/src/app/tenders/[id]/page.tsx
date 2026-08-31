@@ -138,7 +138,13 @@ export default async function TenderDetailsPage({ params }: { params: Promise<{ 
                           
                           <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 mb-2">{req.description}</p>
                           <div className="bg-neutral-50 dark:bg-neutral-900 p-2 rounded text-xs text-neutral-600 dark:text-neutral-400 font-mono mb-2">
-                            {JSON.stringify(req.metadata)}
+                            {req.metric && <span>Metric: {req.metric} </span>}
+                            {req.operator && <span>{req.operator} </span>}
+                            {req.threshold && <span>{req.threshold} </span>}
+                            {req.currency && <span>{req.currency} </span>}
+                            {req.unit && <span>{req.unit} </span>}
+                            {req.period && <span>({req.period}) </span>}
+                            {req.isMandatory ? <span className="text-red-500">[Mandatory]</span> : <span className="text-neutral-400">[Optional]</span>}
                           </div>
                           
                           {assessment && (
