@@ -8,7 +8,10 @@ interface FileUploadProps {
   label?: string;
 }
 
+import { useRouter } from 'next/navigation';
+
 export function FileUpload({ endpoint, onSuccess, label = "Upload PDF" }: FileUploadProps) {
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -36,6 +39,8 @@ export function FileUpload({ endpoint, onSuccess, label = "Upload PDF" }: FileUp
       if (onSuccess) {
         onSuccess();
       }
+      
+      router.refresh();
       
       setTimeout(() => {
         setIsSuccess(false);
