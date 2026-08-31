@@ -1,0 +1,216 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users          User[]
+  companyProfile CompanyProfile?
+  tenders        Tender[]
+}
+
+model User {
+  id             String       @id @default(uuid())
+  email          String       @unique
+  name           String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model CompanyProfile {
+  id             String       @id @default(uuid())
+  organizationId String       @unique
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  
+  documents      CompanyDocument[]
+  facts          ExtractedFact[]
+  
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model CompanyDocument {
+  id               String         @id @default(uuid())
+  companyProfileId String
+  companyProfile   CompanyProfile @relation(fields: [companyProfileId], references: [id])
+  
+  title            String
+  fileUrl          String
+  fileType         String
+  
+  facts            ExtractedFact[]
+  
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model ExtractedFact {
+  id               String          @id @default(uuid())
+  companyProfileId String
+  companyProfile   CompanyProfile  @relation(fields: [companyProfileId], references: [id])
+  documentId       String?
+  document         CompanyDocument? @relation(fields: [documentId], references: [id])
+  
+  category         String          // FINANCIAL, EXPERIENCE, etc.
+  metric           String          // e.g., turnover, project_value
+  value            Json            // Structured value representation
+  pageNumber       Int?
+  section          String?
+  snippet          String?         // Provenance text
+  
+  evidenceRefs     EvidenceReference[]
+
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model Tender {
+  id             String       @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  
+  title          String
+  description    String?
+  deadline       DateTime?
+  status         String       // DRAFT, ANALYZING, COMPLETED
+  
+  documents      TenderDocument[]
+  requirements   Requirement[]
+  assessments    QualificationAssessment[]
+  
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model TenderDocument {
+  id       String @id @default(uuid())
+  tenderId String
+  tender   Tender @relation(fields: [tenderId], references: [id])
+  
+  title    String
+  fileUrl  String
+  fileType String
+  
+  sections TenderSection[]
+  
+  createdAt DateTime @default(now())
+}
+
+model TenderSection {
+  id         String         @id @default(uuid())
+  documentId String
+  document   TenderDocument @relation(fields: [documentId], references: [id])
+  
+  title      String
+  content    String
+  pageNumber Int
+}
+
+model Requirement {
+  id          String   @id @default(uuid())
+  tenderId    String
+  tender      Tender   @relation(fields: [tenderId], references: [id])
+  
+  title       String
+  description String
+  category    String   // FINANCIAL, EXPERIENCE, TECHNICAL, LEGAL, CERTIFICATION, DOCUMENTATION, TIMELINE, EMD, TURNOVER, OTHER
+  
+  sourceDocumentId String?
+  sourcePage       Int?
+  
+  metric      String?
+  operator    String?  // >=, <=, ==
+  threshold   Float?
+  currency    String?
+  unit        String?
+  period      String?
+  isMandatory Boolean  @default(true)
+  
+  ambiguity   String?  // Notes on why requirement is ambiguous
+  
+  assessments QualificationAssessment[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model QualificationAssessment {
+  id            String      @id @default(uuid())
+  tenderId      String
+  tender        Tender      @relation(fields: [tenderId], references: [id])
+  requirementId String
+  requirement   Requirement @relation(fields: [requirementId], references: [id])
+  
+  status        String      // PASS, FAIL, PARTIAL, NEEDS_REVIEW, NOT_APPLICABLE
+  reasoning     String
+  confidence    Float
+  
+  isVerified    Boolean     @default(false)
+  
+  evidence      RequirementEvidence[]
+  recommendations Recommendation[]
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model RequirementEvidence {
+  id            String                  @id @default(uuid())
+  assessmentId  String
+  assessment    QualificationAssessment @relation(fields: [assessmentId], references: [id])
+  
+  factId        String?
+  justification String
+}
+
+model EvidenceReference {
+  id             String        @id @default(uuid())
+  factId         String
+  fact           ExtractedFact @relation(fields: [factId], references: [id])
+  
+  documentId     String?       // if not derived from fact.documentId directly
+  pageNumber     Int?
+  snippet        String
+}
+
+model AgentTrajectory {
+  id            String   @id @default(uuid())
+  runId         String   // Grouping multiple agents into a run
+  agentName     String
+  promptVersion String
+  
+  inputContext  Json
+  toolCalls     Json?
+  toolResults   Json?
+  output        Json
+  
+  verificationResult String?
+  retries            Int     @default(0)
+  
+  createdAt     DateTime @default(now())
+}
+
+model Recommendation {
+  id           String                  @id @default(uuid())
+  assessmentId String
+  assessment   QualificationAssessment @relation(fields: [assessmentId], references: [id])
+  
+  actionText   String                  // "If Project #4 is verified..."
+  potentialStatus String               // "PASS"
+  
+  createdAt    DateTime                @default(now())
+}
