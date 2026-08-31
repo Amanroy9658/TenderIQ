@@ -1,0 +1,13 @@
+{
+  "name": "@tenderiq/shared",
+  "version": "1.0.0",
+  "description": "Shared DTOs and types for TenderIQ",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
