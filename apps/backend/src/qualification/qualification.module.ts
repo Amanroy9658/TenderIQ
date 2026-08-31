@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { QualificationService } from './qualification.service';
 import { QualificationController } from './qualification.controller';
 
+import { AiModule } from '../ai/ai.module';
+
 @Module({
+  imports: [AiModule],
   controllers: [QualificationController],
   providers: [QualificationService],
   exports: [QualificationService],

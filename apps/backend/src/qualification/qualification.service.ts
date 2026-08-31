@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface ReadinessReport {
@@ -18,11 +18,26 @@ export interface ReadinessReport {
   contradictions: any[];
 }
 
+import { LLM_PROVIDER, type LLMProvider } from '../ai/llm.provider';
+import { z } from 'zod';
+import { MATCHING_SYSTEM_PROMPT, getMatchingUserPrompt } from '../prompts/matching/v1';
+
+const AssessmentSchema = z.object({
+  status: z.enum(['PASS', 'FAIL', 'PARTIAL', 'NEEDS_REVIEW', 'NOT_APPLICABLE']),
+  reasoning: z.string(),
+  confidence: z.number().min(0).max(1),
+  usedFactIds: z.array(z.string()),
+  justification: z.string(),
+});
+
 @Injectable()
 export class QualificationService {
   private readonly logger = new Logger(QualificationService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(LLM_PROVIDER) private readonly llm: LLMProvider,
+  ) {}
 
   async generateReadinessReport(tenderId: string, companyProfileId: string): Promise<ReadinessReport> {
     // 1. Fetch all requirements for the tender
@@ -126,5 +141,70 @@ export class QualificationService {
       missingRequirements,
       contradictions,
     };
+  }
+  async evaluateTender(tenderId: string, companyProfileId: string) {
+    // 1. Fetch requirements
+    const requirements = await this.prisma.requirement.findMany({
+      where: { tenderId },
+    });
+
+    // 2. Fetch company facts
+    const facts = await this.prisma.extractedFact.findMany({
+      where: { companyProfileId },
+    });
+
+    const newAssessments = [];
+
+    // 3. Evaluate each requirement
+    for (const req of requirements) {
+      // Check if already assessed
+      const existing = await this.prisma.qualificationAssessment.findFirst({
+        where: { tenderId, requirementId: req.id },
+      });
+      if (existing) continue;
+
+      try {
+        const result = await this.llm.generateStructured({
+          prompt: getMatchingUserPrompt(req, facts),
+          system: MATCHING_SYSTEM_PROMPT,
+          schema: AssessmentSchema,
+          schemaName: 'RequirementAssessment',
+        });
+
+        // Save assessment
+        const assessment = await this.prisma.qualificationAssessment.create({
+          data: {
+            tenderId,
+            requirementId: req.id,
+            status: result.status,
+            reasoning: result.reasoning,
+            confidence: result.confidence,
+          },
+        });
+
+        // Link evidence (facts used)
+        if (result.usedFactIds && result.usedFactIds.length > 0) {
+          for (const factId of result.usedFactIds) {
+            // Check if fact actually exists to prevent foreign key errors
+            const factExists = facts.find(f => f.id === factId);
+            if (factExists) {
+              await this.prisma.requirementEvidence.create({
+                data: {
+                  assessmentId: assessment.id,
+                  factId: factExists.id,
+                  justification: result.justification || 'Extracted by AI matching engine',
+                },
+              });
+            }
+          }
+        }
+        
+        newAssessments.push(assessment);
+      } catch (error) {
+        this.logger.error(`Failed to evaluate requirement ${req.id}`, error);
+      }
+    }
+
+    return newAssessments;
   }
 }
